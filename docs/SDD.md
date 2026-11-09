@@ -556,7 +556,7 @@ Rules (server-authoritative, mirrored in local mode):
 
 ```mermaid
 stateDiagram-v2
-    [*] --> waiting: room:create
+    [*] --> waiting: room created
     waiting --> active: second player joins
     waiting --> deleted: creator cancels / 24h inactivity
     active --> aborted: abort before both first moves
@@ -721,7 +721,7 @@ sequenceDiagram
     participant O as Opponent
     P--xS: socket closes
     S-)O: room:presence {P: false}
-    Note over S: arm abandon timer (60s); P's clock keeps running if it is P's turn
+    Note over S: arm abandon timer (60s), P's clock keeps running if it is P's turn
     P->>S: (new socket) room:join {code, token}
     S-->>P: ack {role, state vN}
     Note over S: cancel abandon timer
