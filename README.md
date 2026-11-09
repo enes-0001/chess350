@@ -24,7 +24,7 @@ It is built for the CS350 (KAIST) team project. The client is Team 3, and the re
 | F14 flip board, optional auto-flip after each move                           | `LocalGame.tsx`                                              |
 | F22 step through moves (⏮ ◀ ▶ ⏭, click a move, ← → keys)                     | `packages/client/src/components/MoveList.tsx`                |
 | F24 download the game as PGN                                                 | `ChessGame.toPgn()`                                          |
-| SRS 2.3 local mode works **offline** after the first visit                   | `packages/client/build/sw.template.js` (service worker)      |
+| SRS 2.3 local mode works **offline** after the first visit                   | `packages/client/sw/sw.template.js` (service worker)         |
 | Captured pieces + material difference, promotion picker, game kept on reload | `components/CapturedPieces.tsx`, `Board.tsx`, `localGame.ts` |
 
 ## Try it

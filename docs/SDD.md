@@ -543,7 +543,7 @@ Limits live in `config.ts` so they are easy to tune after the load test.
 ### 8.7 Offline / PWA
 
 - **A hand-written service worker (ADR-013)** makes `/local` work offline after the first visit.
-  - **Source:** `client/build/sw.template.js`. At build time `client/build/serviceWorkerPlugin.ts` turns it into `dist/sw.js`, with a version hash and the exact list of built files.
+  - **Source:** `client/sw/sw.template.js`. At build time `client/sw/serviceWorkerPlugin.ts` turns it into `dist/sw.js`, with a version hash and the exact list of built files.
   - **install:** precaches `/` and every asset.
   - **navigate:** network first, so new deploys show up; falls back to the cached app shell when offline.
   - **assets:** cache first. Their names are content-hashed, so they never go stale.
