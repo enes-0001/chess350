@@ -1,0 +1,34 @@
+# Dependencies & builds
+node_modules/
+dist/
+build/
+coverage/
+.vite/
+*.tsbuildinfo
+
+# Test artifacts
+playwright-report/
+test-results/
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Local Claude Code settings
+.claude/settings.local.json
+
+# Client's SRS PDF: contains student IDs of Team 3 members, so it is kept out of a public repo.
+# Teammates can get it from KLMS. Remove this line only if Team 3 agrees to publish it.
+Team3_SRS.pdf
