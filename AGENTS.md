@@ -6,7 +6,54 @@
 >
 > **Keep it alive:** when you make a decision, learn something non-obvious, or change a rule, update this file in the same PR.
 
-Last updated: 2026-11-09
+Last updated: 2026-11-09 (Checkpoint 1: offline local mode)
+
+---
+
+## 0. Quick start — see the app running (for humans and agents)
+
+**Current status:** Checkpoint 1 is done. **Local mode is fully playable and works offline.** Online play (invite codes) is the next milestone (sprint 3).
+
+**Run it.** You need Node 24 and git.
+
+```bash
+git clone https://github.com/enes-0001/chess350.git
+cd chess350
+npm install
+npm run build
+npm start
+```
+
+Then open **http://localhost:3000** and click **Play locally**.
+
+- `npm start` runs the production server on :3000 and serves the built client too.
+- **For development with hot reload**, run `npm run dev` and open **http://localhost:5173** instead.
+- **If port 3000 is taken:** on Git Bash / macOS / Linux use `PORT=3100 npm start`; on PowerShell use `$env:PORT=3100; npm start`.
+
+**What to try:**
+
+- **Moves:** click a piece, then a highlighted square, or drag it. Illegal moves are refused.
+- **Game end:** play `e4 e5 Bc4 Nc6 Qh5 Nf6 Qxf7#` to see checkmate.
+- **Review:** ⏮ ◀ ▶ ⏭ or the arrow keys.
+- **Other controls:** Undo/Redo, Flip, _Flip after each move_, Download PGN.
+- **Promotion:** push a pawn to the last rank to get the promotion picker.
+- **Persistence:** reload the page and the game is still there.
+- **Offline:** after one visit, stop the server (or go offline) and reload `/local`. It still works.
+
+**Verify everything** (what CI runs):
+
+```bash
+npm run check
+npm run build
+npx playwright install chromium
+npm run e2e
+```
+
+- `npm run check` is lint + format + typecheck + unit/integration tests.
+- `npx playwright install chromium` is needed once only.
+- `npm run e2e` is 33 browser tests (local mode, offline, smoke).
+
+**Agents:** read §1–§5 and §11 before changing code. The plan with task IDs is [`docs/BACKLOG.md`](docs/BACKLOG.md).
 
 ---
 
@@ -259,6 +306,8 @@ Format: **ID — decision** (date, status). _Why._ Add new ones at the bottom. N
 - **ADR-010 — Bot engine and project license** (2026-11-09, **open**). _Stockfish (WASM) is GPL-3.0. If we ship it, the simplest compliant path is to license the whole repo GPL-3.0 (the source is public on GitHub anyway). Alternative: no bot, or a self-written weak engine (unlikely to reach 1500 Elo). Decide with the client before starting F15._
 - **ADR-011 — No lag compensation; fixed 300 ms flag grace** (2026-11-09, accepted). _YAGNI. Revisit only if Sync 2 testing shows unfair flags._
 - **ADR-012 — Clocks start after both first moves; 30 s first-move timeout aborts** (2026-11-09, proposed). _Matches lichess. Avoids losing on time because the opponent was slow to open the link._
+- **ADR-013 — Hand-written service worker instead of vite-plugin-pwa** (2026-11-09, accepted). _~30 lines plus a tiny Vite plugin that injects the exact build file list. No dependency to keep compatible with Vite 8. Every line is readable and testable (E2E offline test). Revisit if we need install prompts or a web manifest._
+- **ADR-014 — Local games persist in `localStorage`** (2026-11-09, accepted). _A refresh or crash must not lose a game on a phone. The data is per device, validated on load, and never sent anywhere. It is not "permanent game history" (F21 stays out of scope)._
 
 ---
 

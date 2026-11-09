@@ -143,7 +143,12 @@ export default tseslint.config(
     },
   },
   {
-    files: ['packages/client/e2e/**/*.ts', '**/*.config.{js,ts}'],
+    files: ['packages/client/e2e/**/*.ts', '**/*.config.{js,ts}', 'packages/client/sw/**/*.ts'],
     languageOptions: { globals: { ...globals.node } },
+  },
+  {
+    // Service worker template (ADR-013): runs in the SW global scope, placeholder filled at build.
+    files: ['packages/client/sw/sw.template.js'],
+    languageOptions: { globals: { ...globals.serviceworker, __PRECACHE__: 'readonly' } },
   },
 );

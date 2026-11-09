@@ -7,7 +7,7 @@
 | **Client team**    | Team 3 — Alexis Rodet, Ahmed Ouarda, Marcell Vizhanyo, Ors Mandli      |
 | **Developer team** | Team _TBD_ — _member names TBD_                                        |
 | **Course**         | CS350 Introduction to Software Engineering, KAIST, 2026                |
-| **Version**        | 0.1 — draft, 2026-11-09                                                |
+| **Version**        | 0.2 — draft, 2026-11-09 (Checkpoint 1: offline local mode implemented) |
 | **Status**         | Draft. To be reviewed with the client at Sync 1 (see §21).             |
 
 > This document is the single source of truth for _how_ we build the system the SRS describes.
@@ -299,6 +299,8 @@ export interface Outcome {
 
 export class ChessGame {
   constructor(movesUci?: Uci[]); // replay from start position
+  static fromFen(fen: string, movesUci?: Uci[]): ChessGame; // tests / tools only
+  get movesUci(): Uci[];
   get turn(): Color;
   get ply(): number;
   get fen(): string;
@@ -522,8 +524,11 @@ Limits live in `config.ts` so they are easy to tune after the load test.
 
 ### 8.5 Local mode
 
-- `LocalController` owns a `ChessGame`, an undo stack and a redo stack.
+- **Implemented in Checkpoint 1** as a pure reducer, `client/src/local/localGame.ts`, over `{ moves, redo, viewPly }`. Every action validates through core's `ChessGame`. The screen is `client/src/screens/LocalGame.tsx`.
 - **Undo/redo (F13):** a new move clears the redo stack. Only available in untimed games (A9).
+- **Review (F22):** `viewPly` shows an earlier position (buttons ⏮ ◀ ▶ ⏭, clicking a move, keys ← →). The board is read-only while reviewing. "Back to the game" or the last ply returns to live.
+- **Persistence:** moves and the redo stack are saved to `localStorage` (`350chess:local-game`), wrapped in try/catch, and validated on load. A reload never loses a local game. This is a per-device convenience, not game history (F21 stays out of scope).
+- **PGN (F24):** "Download PGN" exports `ChessGame.toPgn()` with Seven Tag Roster headers.
 - **Flip after each move (F14):** an optional toggle.
 - **Clocks:** the same `core/clock` functions with `performance.now()`. Flag detection uses a local timer.
 - **Bot (F15, Could):** Stockfish WASM in a Web Worker with UCI options `UCI_LimitStrength=true`, `UCI_Elo=1500` and a small think time. The UI never blocks.
@@ -537,8 +542,15 @@ Limits live in `config.ts` so they are easy to tune after the load test.
 
 ### 8.7 Offline / PWA
 
-- vite-plugin-pwa precaches the app shell, so `/local` works offline after the first visit.
-- Online routes show "You're offline" instead of failing silently.
+- **A hand-written service worker (ADR-013)** makes `/local` work offline after the first visit.
+  - **Source:** `client/sw/sw.template.js`. At build time `client/sw/serviceWorkerPlugin.ts` turns it into `dist/sw.js`, with a version hash and the exact list of built files.
+  - **install:** precaches `/` and every asset.
+  - **navigate:** network first, so new deploys show up; falls back to the cached app shell when offline.
+  - **assets:** cache first. Their names are content-hashed, so they never go stale.
+  - **Never cached:** `/socket.io` and `/healthz`.
+  - **Registration:** production builds only (`src/lib/registerServiceWorker.ts`). The server sends `sw.js` and `index.html` with `Cache-Control: no-cache`.
+  - **Tested by** E2E "local mode works offline after the first visit" (Playwright `context.setOffline`).
+- Online routes show "You're offline" instead of failing silently (S3).
 
 ### 8.8 Responsive layout
 
@@ -1092,6 +1104,7 @@ We played test games on lichess.org and read parts of its open-source code. Summ
 
 ## Appendix B — Change log
 
-| Version | Date       | Change                                    | Author                                         |
-| ------- | ---------- | ----------------------------------------- | ---------------------------------------------- |
-| 0.1     | 2026-11-09 | Initial draft from SRS + lichess research | Team (AI-assisted, see `docs/ai-usage-log.md`) |
+| Version | Date       | Change                                                                                                                                                                    | Author                                         |
+| ------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| 0.1     | 2026-11-09 | Initial draft from SRS + lichess research                                                                                                                                 | Team (AI-assisted, see `docs/ai-usage-log.md`) |
+| 0.2     | 2026-11-09 | Checkpoint 1 (offline local mode): `ChessGame.fromFen`/`needsPromotion`/`movesUci` (§6.1), local persistence + review (§8.5), hand-written service worker (§8.7, ADR-013) | Team (AI-assisted)                             |
