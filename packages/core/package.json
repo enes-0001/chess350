@@ -1,0 +1,19 @@
+{
+  "name": "@chess350/core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pure domain core: chess rules, clock, protocol schemas, PGN. No I/O.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "chess.js": "^1.4.0",
+    "zod": "^4.6.7"
+  }
+}

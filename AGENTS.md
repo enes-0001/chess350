@@ -2,7 +2,7 @@
 
 > **Read this first.** This file is for both humans (teammates) and AI coding agents (Claude Code, Codex, Cursor, Copilot, …).
 > It holds everything we know and have decided, so nobody has to re-discover it.
-> The detailed design lives in [`docs/SDD.md`](docs/SDD.md). This file is the *why*, the *rules* and the *context*.
+> The detailed design lives in [`docs/SDD.md`](docs/SDD.md). This file is the _why_, the _rules_ and the _context_.
 >
 > **Keep it alive:** when you make a decision, learn something non-obvious, or change a rule, update this file in the same PR.
 
@@ -67,14 +67,14 @@ The course project has two roles per team:
 
 ### 2.3 Key dates
 
-| Date | What |
-|---|---|
-| 2026-11-09 | SRS chosen. SDD v0.1 drafted. Lichess research done. |
-| Week of Nov 9 | **Sync 1** with Team 3 — _date TBD_ |
-| 2026-12-13 | Code freeze (planned) |
-| Week of Dec 7 | **Sync 2** with Team 3 — _date TBD_ |
-| _TBD_ | Final presentation |
-| **2026-12-18 18:00** | Team + individual reports due |
+| Date                 | What                                                 |
+| -------------------- | ---------------------------------------------------- |
+| 2026-11-09           | SRS chosen. SDD v0.1 drafted. Lichess research done. |
+| Week of Nov 9        | **Sync 1** with Team 3 — _date TBD_                  |
+| 2026-12-13           | Code freeze (planned)                                |
+| Week of Dec 7        | **Sync 2** with Team 3 — _date TBD_                  |
+| _TBD_                | Final presentation                                   |
+| **2026-12-18 18:00** | Team + individual reports due                        |
 
 ---
 
@@ -218,36 +218,47 @@ If a change seems to require breaking one, **stop and discuss with the team firs
 
 ### 6.5 Commands
 
-The repo is not scaffolded yet. These are the planned scripts; update this table when they exist.
+Requires Node 24 (`.nvmrc`). Run everything from the repo root.
 
-| Command | Does |
-|---|---|
-| `npm install` | Install all workspaces |
-| `npm run dev` | Server + client in watch mode |
-| `npm test` | Unit + integration tests (Vitest) |
-| `npm run e2e` | Playwright E2E |
-| `npm run lint` / `npm run typecheck` | ESLint + Prettier / `tsc -b` |
-| `npm run build` | Production build (client static + server) |
-| `npm run loadtest` | 200-room load test against `LOADTEST_URL` |
+| Command                      | Does                                                                                  |
+| ---------------------------- | ------------------------------------------------------------------------------------- |
+| `npm install`                | Install all workspaces                                                                |
+| `npm run dev`                | Server (:3000, `tsx watch`) + client (:5173, Vite, proxies `/socket.io`) — open :5173 |
+| `npm run check`              | **Run before every PR:** lint + format check + typecheck + unit/integration tests     |
+| `npm test`                   | Unit + integration tests (Vitest) in all packages                                     |
+| `npm run lint` / `format`    | ESLint (incl. invariant rules) / Prettier write                                       |
+| `npm run typecheck`          | `tsc` in every package                                                                |
+| `npm run build`              | Production build: `packages/client/dist` + `packages/server/dist/index.js`            |
+| `npm start`                  | Run the production build on :3000 (serves the client too)                             |
+| `npm run e2e`                | Playwright E2E against the production build (run `npm run build` first)               |
+| `docker build -t chess350 .` | Production image                                                                      |
+| _(S5-06)_ `npm run loadtest` | 200-room load test (not created yet)                                                  |
+
+### 6.6 Where things are, and how to find open work
+
+- **Plan:** [`docs/BACKLOG.md`](docs/BACKLOG.md). Every task has an ID like `S3-02`.
+- **Open code:** `grep -rn "notImplemented(" packages/` lists every unimplemented function, tagged with its task ID.
+- **Open tests:** `it.todo(...)` / `test.fixme(...)` entries carry the SDD test IDs (`T-M4`, `E3`). Turn them into real tests when you implement the feature.
+- **Invariants in code:** `eslint.config.js` enforces invariants #2, #3, #10 and the import rules. A lint error mentioning an invariant is a design rule, not style. Do not disable it.
 
 ---
 
 ## 7. Decision log (lightweight ADRs)
 
-Format: **ID — decision** (date, status). *Why.* Add new ones at the bottom. Never delete: supersede.
+Format: **ID — decision** (date, status). _Why._ Add new ones at the bottom. Never delete: supersede.
 
-- **ADR-001 — TypeScript monorepo with `core` / `server` / `client`** (2026-11-09, accepted). *One language. Shared rules and protocol types. Pure core is testable and reused by local mode.*
-- **ADR-002 — chess.js for rules** (2026-11-09, accepted). *Complete FIDE rules incl. all draw conditions and PGN. BSD-2. Writing our own move generator is high-risk and low-value.*
-- **ADR-003 — Socket.IO instead of raw `ws`** (2026-11-09, accepted). *Heartbeats, auto-reconnect, rooms and acks out of the box. Still WebSocket underneath (RFC 6455). One transport for everything; no REST except `/healthz`.*
-- **ADR-004 — Full versioned snapshots, not deltas or event replay** (2026-11-09, accepted). *Eliminates desync bugs and makes reconnect trivial. Snapshots are a few KB. Lichess replays events by version instead; we chose simplicity.*
-- **ADR-005 — No database; rooms in memory; single instance** (2026-11-09, accepted). *Allowed by SRS 2.4. A restart loses games: accepted and shown clearly in the UI.*
-- **ADR-006 — Seat token in `localStorage`, sent in `room:join`; never in URLs** (2026-11-09, accepted). *Links get shared, screenshotted and stored in history. The public code must only grant spectating or the empty seat. Lichess uses an httpOnly cookie + 4-char suffix in the socket URL; `localStorage` is simpler for us and works per-room.*
-- **ADR-007 — Automatic draws for threefold / 50-move** (2026-11-09, proposed — confirm at Sync 1). *SRS says "detect". Claims add UI complexity.*
-- **ADR-008 — react-chessboard (MIT) over chessground (GPL-3.0)** (2026-11-09, accepted). *License and React fit.*
-- **ADR-009 — Injected time everywhere; integer ms** (2026-11-09, accepted). *Deterministic tests for clocks and timeouts. Mirrors `scalachess` (`timestamper`).*
-- **ADR-010 — Bot engine and project license** (2026-11-09, **open**). *Stockfish (WASM) is GPL-3.0. If we ship it, the simplest compliant path is to license the whole repo GPL-3.0 (the source is public on GitHub anyway). Alternative: no bot, or a self-written weak engine (unlikely to reach 1500 Elo). Decide with the client before starting F15.*
-- **ADR-011 — No lag compensation; fixed 300 ms flag grace** (2026-11-09, accepted). *YAGNI. Revisit only if Sync 2 testing shows unfair flags.*
-- **ADR-012 — Clocks start after both first moves; 30 s first-move timeout aborts** (2026-11-09, proposed). *Matches lichess. Avoids losing on time because the opponent was slow to open the link.*
+- **ADR-001 — TypeScript monorepo with `core` / `server` / `client`** (2026-11-09, accepted). _One language. Shared rules and protocol types. Pure core is testable and reused by local mode._
+- **ADR-002 — chess.js for rules** (2026-11-09, accepted). _Complete FIDE rules incl. all draw conditions and PGN. BSD-2. Writing our own move generator is high-risk and low-value._
+- **ADR-003 — Socket.IO instead of raw `ws`** (2026-11-09, accepted). _Heartbeats, auto-reconnect, rooms and acks out of the box. Still WebSocket underneath (RFC 6455). One transport for everything; no REST except `/healthz`._
+- **ADR-004 — Full versioned snapshots, not deltas or event replay** (2026-11-09, accepted). _Eliminates desync bugs and makes reconnect trivial. Snapshots are a few KB. Lichess replays events by version instead; we chose simplicity._
+- **ADR-005 — No database; rooms in memory; single instance** (2026-11-09, accepted). _Allowed by SRS 2.4. A restart loses games: accepted and shown clearly in the UI._
+- **ADR-006 — Seat token in `localStorage`, sent in `room:join`; never in URLs** (2026-11-09, accepted). _Links get shared, screenshotted and stored in history. The public code must only grant spectating or the empty seat. Lichess uses an httpOnly cookie + 4-char suffix in the socket URL; `localStorage` is simpler for us and works per-room._
+- **ADR-007 — Automatic draws for threefold / 50-move** (2026-11-09, proposed — confirm at Sync 1). _SRS says "detect". Claims add UI complexity._
+- **ADR-008 — react-chessboard (MIT) over chessground (GPL-3.0)** (2026-11-09, accepted). _License and React fit._
+- **ADR-009 — Injected time everywhere; integer ms** (2026-11-09, accepted). _Deterministic tests for clocks and timeouts. Mirrors `scalachess` (`timestamper`)._
+- **ADR-010 — Bot engine and project license** (2026-11-09, **open**). _Stockfish (WASM) is GPL-3.0. If we ship it, the simplest compliant path is to license the whole repo GPL-3.0 (the source is public on GitHub anyway). Alternative: no bot, or a self-written weak engine (unlikely to reach 1500 Elo). Decide with the client before starting F15._
+- **ADR-011 — No lag compensation; fixed 300 ms flag grace** (2026-11-09, accepted). _YAGNI. Revisit only if Sync 2 testing shows unfair flags._
+- **ADR-012 — Clocks start after both first moves; 30 s first-move timeout aborts** (2026-11-09, proposed). _Matches lichess. Avoids losing on time because the opponent was slow to open the link._
 
 ---
 
@@ -263,7 +274,7 @@ We studied lichess because it already does exactly what our SRS asks for. Method
 ### 8.1 Friend-game setup dialog ("Challenge a friend")
 
 - One screen: **Variant** (we skip it), **Time**, **Side**, and one button.
-- **Time:** three tabs — *Unlimited*, *Real time*, *Correspondence*.
+- **Time:** three tabs — _Unlimited_, _Real time_, _Correspondence_.
   - Real time has two sliders (minutes per side, increment seconds).
   - Preset buttons: `1+0 2+1 3+0 3+2 5+0 5+3 10+0 10+5 15+10 30+0`.
 - **Side:** three big buttons: White / **Random (default)** / Black.
@@ -355,32 +366,38 @@ Player connection, after creating a 5+3 game as white and playing 1.e4:
 
 ### 9.1 Log
 
-| # | Date | Type | With | Notes file |
-|---|---|---|---|---|
-| 1 | _TBD_ | Sync 1 (design direction) | Team 3 | `docs/meetings/YYYY-MM-DD-sync1.md` |
-| 2 | _TBD_ | Sync 2 (acceptance) | Team 3 | `docs/meetings/YYYY-MM-DD-sync2.md` |
+| #   | Date  | Type                      | With   | Notes file                          |
+| --- | ----- | ------------------------- | ------ | ----------------------------------- |
+| 1   | _TBD_ | Sync 1 (design direction) | Team 3 | `docs/meetings/YYYY-MM-DD-sync1.md` |
+| 2   | _TBD_ | Sync 2 (acceptance)       | Team 3 | `docs/meetings/YYYY-MM-DD-sync2.md` |
 
 ### 9.2 Template (`docs/meetings/YYYY-MM-DD-<topic>.md`)
 
 ```markdown
 # <Topic> — YYYY-MM-DD
+
 - Type: Sync 1 / Sync 2 / sprint review / internal
 - Attendees: (names, team)
 - Medium: in person / Zoom / Slack
 
 ## Agenda
+
 1. ...
 
 ## Discussion & decisions
+
 - D1: ... (affects F#, SDD §, ADR-0xx)
 
 ## Requirement changes
+
 | Req | Before | After | Reason |
 
 ## Action items
+
 | Owner | Action | Due |
 
 ## Notes for the final report
+
 - How the project changed because of this meeting: ...
 ```
 
@@ -425,16 +442,16 @@ Player connection, after creating a 5+3 game as white and playing 1.e4:
 
 The full table is in SDD §1.4.
 
-| Term | Meaning |
-|---|---|
-| room | Server-side game session |
-| code | Public 6-char invite code |
-| seat / token | Player slot / its secret |
-| ply | Half-move |
-| UCI | `e2e4` wire format for moves |
-| SAN | `Nf3` display format |
-| FEN | Board position string |
-| snapshot / `v` | Full room state / its version |
-| abort | Cancel before both first moves, no result |
-| abandon | Disconnected past the grace period, loss |
-| flag | Run out of time |
+| Term           | Meaning                                   |
+| -------------- | ----------------------------------------- |
+| room           | Server-side game session                  |
+| code           | Public 6-char invite code                 |
+| seat / token   | Player slot / its secret                  |
+| ply            | Half-move                                 |
+| UCI            | `e2e4` wire format for moves              |
+| SAN            | `Nf3` display format                      |
+| FEN            | Board position string                     |
+| snapshot / `v` | Full room state / its version             |
+| abort          | Cancel before both first moves, no result |
+| abandon        | Disconnected past the grace period, loss  |
+| flag           | Run out of time                           |

@@ -1,0 +1,6 @@
+# Normalise line endings: LF in the repo and in working copies (Windows teammates included).
+* text=auto eol=lf
+*.pdf binary
+*.png binary
+*.jpg binary
+*.svg text
