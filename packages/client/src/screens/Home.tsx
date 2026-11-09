@@ -57,6 +57,7 @@ export function Home() {
 
       <section className="card">
         <h2>Local</h2>
+        <p className="muted">Two players on this device. Works offline after your first visit.</p>
         <button type="button" onClick={() => navigate('/local')}>
           Play locally
         </button>

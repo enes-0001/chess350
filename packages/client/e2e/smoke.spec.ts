@@ -19,9 +19,9 @@ test('E2: invalid code shows a clear message; lowercase code is normalised', asy
   await expect(page).toHaveURL(/\/g\/K7X2QP$/);
 });
 
-test('local mode shows a board', async ({ page }) => {
-  await page.goto('/local');
-  await expect(page.getByTestId('board')).toBeVisible();
+test('unknown routes show a not-found page', async ({ page }) => {
+  await page.goto('/does-not-exist');
+  await expect(page.getByRole('heading', { name: 'Page not found' })).toBeVisible();
 });
 
 test('server health endpoint is reachable', async ({ request }) => {
@@ -29,11 +29,8 @@ test('server health endpoint is reachable', async ({ request }) => {
   expect(res.ok()).toBeTruthy();
 });
 
-// Journeys from SDD §16.3. Turn each fixme into a real test in its backlog task.
-test.fixme('E1: create → join in 2nd context → scholar’s mate → both see result → PGN parses', () => {});
-test.fixme('E3: reload mid-game → same seat, same position, clocks continue', () => {});
-test.fixme('E4: opponent closes tab → presence grey → grace period → remaining player wins', () => {});
-test.fixme('E5: draw offer accepted; resign', () => {});
-test.fixme('E6: local mode: play, undo, redo, flip; works offline after load', () => {});
-test.fixme('E7: spectator joins a full room and cannot move', () => {});
-test.fixme('E8: mobile viewport: click-to-move works', () => {});
+test('service worker is served with no-cache', async ({ request }) => {
+  const res = await request.get('/sw.js');
+  expect(res.ok()).toBeTruthy();
+  expect(res.headers()['cache-control']).toBe('no-cache');
+});

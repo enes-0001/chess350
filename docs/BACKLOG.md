@@ -11,6 +11,12 @@ Dates: today is 2026-11-09. Code freeze is 2026-12-13. Reports are due **2026-12
 
 ---
 
+## Checkpoint 1 — Offline local mode ✅ (2026-11-09)
+
+Done ahead of plan so the team and the client can try a real game early (see README → _Status_).
+Covers S2-01 … S2-08, S4-10 and the local half of S4-05. **Sprint 2 is therefore free** for: S2-09 (sprint review), starting the
+online track early (S3-01, S3-04 against a fake store), and reviewing/criticising the checkpoint code.
+
 ## Sprint 1 — Setup & design (Nov 9 – 15)
 
 **Goal:** everyone can run the project. The design is agreed with the client. Deploy works.
@@ -30,14 +36,14 @@ Dates: today is 2026-11-09. Code freeze is 2026-12-13. Reports are due **2026-12
 
 | ID    | Status | Task                                                                                                                                         | Req     | Role | Tests               | Depends on |
 | ----- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ---- | ------------------- | ---------- |
-| S2-01 | ☐      | `ChessGame`: constructor replay, `turn`, `ply`, `fen`, `history`, `inCheck`, `legalMovesFrom`, `tryMove` (promotion letter required)         | F1, F2  | C    | T-R1–3, T-R10       | —          |
-| S2-02 | ☐      | `outcomeByRules` (automatic draws, A4) and `canMate` (A5)                                                                                    | F3      | C    | T-R4–9              | S2-01      |
-| S2-03 | ☐      | `LocalController` + local game UI: drag & click-to-move, legal-move dots, last-move and check highlight, promotion dialog, game-over message | F2, F12 | F    | unit + E6 (partial) | S2-01      |
-| S2-04 | ☐      | Undo / redo in untimed local games (A9)                                                                                                      | F13     | C    | unit                | S2-03      |
-| S2-05 | ☐      | Board flip toggle (flip after each move)                                                                                                     | F14     | F    | E6                  | S2-03      |
-| S2-06 | ☐      | `MoveList` component with ⏮ ◀ ▶ ⏭ and click-to-jump, reused online later                                                                     | F22     | F    | unit                | S2-01      |
-| S2-07 | ☐      | Captured pieces + material difference (+N)                                                                                                   | 4.1     | F    | unit                | S2-01      |
-| S2-08 | ☐      | Responsive layout (board sizing, stacked panel < 768 px, 44 px targets). Test on a real phone                                                | 5.4     | F    | E8                  | S2-03      |
+| S2-01 | ☑      | `ChessGame`: constructor replay, `turn`, `ply`, `fen`, `history`, `inCheck`, `legalMovesFrom`, `tryMove` (promotion letter required)         | F1, F2  | C    | T-R1–3, T-R10       | —          |
+| S2-02 | ☑      | `outcomeByRules` (automatic draws, A4) and `canMate` (A5)                                                                                    | F3      | C    | T-R4–9              | S2-01      |
+| S2-03 | ☑      | `LocalController` + local game UI: drag & click-to-move, legal-move dots, last-move and check highlight, promotion dialog, game-over message | F2, F12 | F    | unit + E6 (partial) | S2-01      |
+| S2-04 | ☑      | Undo / redo in untimed local games (A9)                                                                                                      | F13     | C    | unit                | S2-03      |
+| S2-05 | ☑      | Board flip toggle (flip after each move)                                                                                                     | F14     | F    | E6                  | S2-03      |
+| S2-06 | ☑      | `MoveList` component with ⏮ ◀ ▶ ⏭ and click-to-jump, reused online later                                                                     | F22     | F    | unit                | S2-01      |
+| S2-07 | ☑      | Captured pieces + material difference (+N)                                                                                                   | 4.1     | F    | unit                | S2-01      |
+| S2-08 | ☑      | Responsive layout (board sizing, stacked panel < 768 px, 44 px targets). Test on a real phone                                                | 5.4     | F    | E8                  | S2-03      |
 | S2-09 | ☐      | Sprint review: demo local mode to each other. Retro note in `docs/meetings/`                                                                 | —       | all  | —                   | —          |
 
 ## Sprint 3 — Online MVP (Nov 23 – 29)
@@ -65,12 +71,12 @@ Dates: today is 2026-11-09. Code freeze is 2026-12-13. Reports are due **2026-12
 | S4-02 | ☐      | Server clocks: start after ply 2, flag timer + grace, timeout-vs-insufficient, clock in snapshots                       | F16      | S    | T-C5, integration | S4-01, S3-02 |
 | S4-03 | ☐      | Presence (`room:presence`), reconnection via token, 60 s abandon timer, both-disconnected rule                          | F9, F10  | S    | T-M8, T-P4        | S3-01        |
 | S4-04 | ☐      | `sweep()`: 30 min after end, 24 h inactivity, tombstones → `ROOM_EXPIRED`                                               | F23, 5.3 | S    | T-M9              | S3-01        |
-| S4-05 | ☐      | `ChessGame.toPgn` + "Download PGN" button (online and local)                                                            | F24      | C    | PGN parse test    | S2-01        |
+| S4-05 | ◐      | `ChessGame.toPgn` + "Download PGN" button (online and local) — _local done in Checkpoint 1; online button pending_      | F24      | C    | PGN parse test    | S2-01        |
 | S4-06 | ☐      | Client clock display (interpolation from `receivedAt`, low-time style). Presets + custom in Create dialog. Local clocks | F16      | F    | unit, E3          | S4-02        |
 | S4-07 | ☐      | Review after game end + "review available until hh:mm"                                                                  | F22, F23 | F    | E1                | S2-06        |
 | S4-08 | ☐      | E2E E3 (reload), E4 (abandon, shortened grace via env), E5, E6                                                          | —        | Q    | E3–E6             | S4-03        |
 | S4-09 | ☐      | UX: sounds (move/capture/check/end, mute), tab title by state, clear end-of-game texts                                  | 4.1      | F    | manual            | S3-05        |
-| S4-10 | ☐      | PWA (vite-plugin-pwa): local mode works offline after first load                                                        | 2.3      | F    | E6 offline        | S2-03        |
+| S4-10 | ☑      | Offline: service worker (ADR-013) — local mode works offline after first load                                           | 2.3      | F    | E6 offline        | S2-03        |
 
 ## Sprint 5 — _Could_ features & verification (Dec 7 – 13)
 

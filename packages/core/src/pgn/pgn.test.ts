@@ -16,6 +16,5 @@ describe('pgn helpers (F24)', () => {
     expect(pgnResult({ result: '1-0', termination: 'checkmate', winner: 'white' })).toBe('1-0');
     expect(pgnResult({ result: null, termination: 'abort', winner: null })).toBe('*');
   });
-
-  it.todo('S4-05: ChessGame.toPgn output parses with a PGN parser');
+  // ChessGame.toPgn round-trip is tested in rules/chessGame.test.ts.
 });

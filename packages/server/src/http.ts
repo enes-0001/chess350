@@ -25,7 +25,19 @@ export function createHttpApp({ clientDist, health }: HttpDeps): Express {
   });
 
   if (clientDist && existsSync(clientDist)) {
-    app.use(express.static(clientDist, { index: false, maxAge: '1y', immutable: true }));
+    app.use(
+      express.static(clientDist, {
+        index: false,
+        maxAge: '1y',
+        immutable: true,
+        // Hashed assets are immutable; the service worker and the HTML shell must always revalidate.
+        setHeaders: (res, filePath) => {
+          if (/(?:^|[\\/])(sw\.js|index\.html)$/.test(filePath)) {
+            res.setHeader('Cache-Control', 'no-cache');
+          }
+        },
+      }),
+    );
     const indexHtml = path.join(clientDist, 'index.html');
     // SPA fallback: any other GET that wants HTML gets index.html (routes like /g/K7X2QP).
     app.use((req, res, next) => {
